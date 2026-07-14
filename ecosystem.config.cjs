@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "slackbot",
+      name: "minimal-slack-bot",
       script: "bun",
       args: ["run", "src/index.ts"],
       interpreter: "none",

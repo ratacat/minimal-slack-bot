@@ -1,4 +1,4 @@
-# Slackbot — channel-scoped Claude agent on ultra
+# Minimal Slack Bot: channel-scoped Claude agent on ultra
 
 Design spec, 2026-07-13. Status: awaiting review. Rev 3 (conjecture-cascade pass:
 300 probes against SDK 0.3.201 types + Slack API docs; all confirmed gaps folded in).
@@ -468,7 +468,7 @@ someone re-mentions the bot.
 One JSON line to stdout per inbound event, Run start/end (with session_id, model,
 cost, `apiKeySource`, `permission_denials` count), approval decision, curation
 outcome, and error; SDK `stderr` callback piped to the same stream. `pm2 logs
-slackbot` is the debugging interface. No log files, no metrics stack.
+minimal-slack-bot` is the debugging interface. No log files, no metrics stack.
 
 ## Cut list (explicit non-goals, with upgrade paths)
 
