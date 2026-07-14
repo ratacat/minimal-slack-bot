@@ -10,7 +10,7 @@ export type ChannelType = "channel" | "group" | "im";
 export interface InboundMessage {
   channelId: string;
   channelType: ChannelType;
-  /** channels/groups: thread_ts ?? ts. DMs: channelId (rolling session). */
+  /** Top-level channels and DMs: channelId (rolling session). Slack threads: thread_ts. */
   threadKey: string;
   /** This message's ts. */
   ts: string;
@@ -26,8 +26,10 @@ export interface InboundMessage {
 
 /** data/channels/<id>/config.json after validation + ~ expansion. */
 export interface ChannelConfig {
-  /** Absolute repo paths (validated to exist) → additionalDirectories. */
+  /** Effective directory grants (channel repos ∪ server permissions.json), absolute and validated → additionalDirectories. */
   repos: string[];
+  /** Effective Bash command prefixes (channel ∪ server permissions.json) auto-approved for Runs and cron. */
+  allowedCommands: string[];
   /** Channel default model alias. */
   model?: string;
   permissionMode: "default" | "acceptEdits";
@@ -35,12 +37,29 @@ export interface ChannelConfig {
 
 export interface ModelAlias {
   model: string;
+  /** SDK reasoning effort for models that support it. */
+  effort?: "low" | "medium" | "high" | "xhigh" | "max";
+  /** providers.json profile name; omitted = provider default. */
+  providerProfile?: string;
   env?: Record<string, string>;
 }
 
 export interface ModelsConfig {
   default: string;
   aliases: Record<string, ModelAlias>;
+}
+
+export type ProviderMode = "api-key" | "claude-subscription" | "proxy";
+
+export interface ProviderProfile {
+  mode: ProviderMode;
+  env?: Record<string, string>;
+  pathToClaudeCodeExecutable?: string;
+}
+
+export interface ProvidersConfig {
+  default: string;
+  profiles: Record<string, ProviderProfile>;
 }
 
 export interface ThreadRow {
@@ -76,6 +95,8 @@ export interface SlackPort {
     blocks?: unknown[];
   }): Promise<{ ts: string }>;
   updateMessage(args: { channel: string; ts: string; text: string; blocks?: unknown[] }): Promise<void>;
+  /** Delete a transient status message after successful completion. */
+  deleteMessage(args: { channel: string; ts: string }): Promise<void>;
   /** files.uploadV2 snippet into a thread (results >4000 chars). */
   uploadTextFile(args: {
     channel: string;
@@ -88,7 +109,7 @@ export interface SlackPort {
     channel: string,
     threadTs: string,
     limit: number,
-  ): Promise<Array<{ userId: string; text: string }>>;
+  ): Promise<Array<{ ts: string; userId: string; text: string }>>;
   /** conversations.info name, uncached (channels.ts caches). undefined for DMs/unnamed. */
   fetchChannelName(channelId: string): Promise<string | undefined>;
 }
@@ -109,6 +130,7 @@ export interface ChannelContext {
 export interface ResolvedModel {
   alias: string;
   model: string;
+  effort?: "low" | "medium" | "high" | "xhigh" | "max";
   env?: Record<string, string>;
   /** Set when a persisted thread alias no longer exists in models.json (warn once). */
   staleThreadAlias?: string;
@@ -119,7 +141,7 @@ export interface ApprovalPort {
   /** CanUseTool bound to one thread's Slack location. */
   canUseToolFor(channel: string, threadTs: string | undefined): CanUseTool;
   /** Approve/Deny button click. value = pending approval id from the block action. */
-  handleAction(value: string, decision: "approve" | "deny", userId: string): Promise<void>;
+  handleAction(value: string, decision: "approve" | "deny", userId: string, messageTs?: string): Promise<void>;
 }
 
 export interface CurationArgs {
@@ -134,11 +156,12 @@ export interface RunDeps {
   approvals: ApprovalPort;
   /** Throws Error on fatal config problems (message is posted in-thread; Run refused). */
   loadChannelContext(channelId: string, threadKey: string): Promise<ChannelContext>;
+  loadProviders(): ProvidersConfig;
   loadModels(): ModelsConfig;
   /** Injected SDK entry points (mocked in tests). */
   queryFn: typeof query;
   getSessionInfoFn: typeof getSessionInfo;
-  runCuration(args: CurationArgs): Promise<void>;
+  runCuration(args: CurationArgs, model: ModelAlias): Promise<void>;
 }
 
 export interface RunManager {

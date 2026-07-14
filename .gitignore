@@ -1,0 +1,8 @@
+node_modules/
+.env
+# Ignore channel state while retaining its tracked directory sentinel.
+data/*
+!data/channels/
+data/channels/*
+!data/channels/.gitkeep
+*.log

@@ -1,0 +1,21 @@
+{
+  "directories": ["~/Projects"],
+  "commandPrefixes": [
+    "pm2",
+    "ls",
+    "cat",
+    "grep",
+    "rg",
+    "find",
+    "git status",
+    "git log",
+    "git diff",
+    "wc",
+    "head",
+    "tail",
+    "bun test",
+    "bun run typecheck",
+    "wideband",
+    "websearch"
+  ]
+}

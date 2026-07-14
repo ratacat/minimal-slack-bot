@@ -1,0 +1,15 @@
+module.exports = {
+  apps: [
+    {
+      name: "slackbot",
+      script: "bun",
+      args: ["run", "src/index.ts"],
+      interpreter: "none",
+      instances: 1,
+      exec_mode: "fork",
+      kill_timeout: 15000,
+      autorestart: true,
+      watch: false,
+    },
+  ],
+};

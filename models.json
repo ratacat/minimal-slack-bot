@@ -1,0 +1,12 @@
+{
+  "default": "fable-low",
+  "aliases": {
+    "fable-low": { "model": "claude-fable-5", "effort": "low", "providerProfile": "vibeproxy" },
+    "sonnet": { "model": "sonnet" },
+    "opus": { "model": "opus" },
+    "haiku": { "model": "haiku" },
+    "sol": { "model": "gpt-5.6-sol", "providerProfile": "vibeproxy" },
+    "terra": { "model": "gpt-5.6-terra", "providerProfile": "vibeproxy" },
+    "luna": { "model": "gpt-5.6-luna", "providerProfile": "vibeproxy" }
+  }
+}

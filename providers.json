@@ -1,0 +1,18 @@
+{
+  "default": "claude-subscription",
+  "profiles": {
+    "claude-subscription": {
+      "mode": "claude-subscription"
+    },
+    "anthropic-api": {
+      "mode": "api-key"
+    },
+    "vibeproxy": {
+      "mode": "proxy",
+      "env": {
+        "ANTHROPIC_BASE_URL": "http://127.0.0.1:8317",
+        "ANTHROPIC_AUTH_TOKEN": "dummy-not-used"
+      }
+    }
+  }
+}
